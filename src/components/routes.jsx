@@ -4,6 +4,7 @@ import Login from "/src/pages/Login";
 import Signup from "/src/pages/Signup";
 import Contact from '/src/pages/contact'; // Make sure this matches your file name
 import CreateQuiz from '/src/pages/createQuiz'; // Make sure this matches your file name
+import CheckoutPage from '/src/pages/CheckoutPage';
 import AdminLayout from '/src/pages/admin/AdminLayout';
 import QuizDetails from '/src/pages/quiz-details'; // Make sure this matches your file name
 
@@ -19,6 +20,7 @@ const routes = createBrowserRouter([
     { path: "/", element: <LandingPage /> },
     { path: "/login", element: <Login /> },
     { path: "/signup", element: <Signup /> },
+    { path: "/checkout", element: <CheckoutPage /> },
     { 
         path: "/admin", 
         element: <AdminLayout />,

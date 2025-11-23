@@ -1,0 +1,187 @@
+.stripe-form {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e4e7;
+}
+
+.payment-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.payment-header h3 {
+  margin: 0 0 8px 0;
+  color: #1a1a1a;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.payment-header .amount {
+  margin: 0;
+  color: #0570de;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+#payment-element {
+  margin-bottom: 24px;
+}
+
+.stripe-button {
+  background: linear-gradient(135deg, #0570de, #0458b3);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 16px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stripe-button::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #0570de, #4ecdc4, #45b7d1);
+  border-radius: 12px;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.stripe-button:hover::before {
+  opacity: 1;
+}
+
+.stripe-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(5, 112, 222, 0.3);
+}
+
+.stripe-button:disabled {
+  background: #aab7c4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.stripe-button:disabled::before {
+  opacity: 0;
+}
+
+.stripe-button:disabled:hover {
+  background: #aab7c4;
+  transform: none;
+}
+
+.spinner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Better loading animation with dots */
+.loading-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.loading-dots::after {
+  content: '';
+  display: inline-flex;
+  gap: 4px;
+}
+
+.loading-dots::before,
+.loading-dots::after {
+  content: '●';
+  font-size: 8px;
+  color: currentColor;
+  animation: loading-dots 1.4s ease-in-out infinite both;
+}
+
+.loading-dots::after {
+  animation-delay: 0.2s;
+}
+
+.loading-dots {
+  position: relative;
+}
+
+.loading-dots .dot1,
+.loading-dots .dot2,
+.loading-dots .dot3 {
+  width: 8px;
+  height: 8px;
+  background-color: currentColor;
+  border-radius: 50%;
+  display: inline-block;
+  animation: loading-dots 1.4s ease-in-out infinite both;
+}
+
+.loading-dots .dot2 {
+  animation-delay: 0.2s;
+}
+
+.loading-dots .dot3 {
+  animation-delay: 0.4s;
+}
+
+@keyframes loading-dots {
+  0%, 80%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.message {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.message.success {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+.message.error {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .stripe-form {
+    padding: 16px;
+    margin: 16px;
+  }
+  
+  .payment-header h3 {
+    font-size: 20px;
+  }
+  
+  .payment-header .amount {
+    font-size: 18px;
+  }
+}

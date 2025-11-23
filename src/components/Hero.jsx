@@ -1,4 +1,5 @@
 import { GraduationCap, Search } from 'lucide-react';
+import PremiumButton from './PremiumButton';
 
 export default function Hero() {
   return (
@@ -45,6 +46,15 @@ export default function Hero() {
           <button className="btn btn-light border">
             🎓 Lesson
           </button>
+        </div>
+
+        <div className="text-center mt-4">
+          <PremiumButton 
+            amount={9.99}
+            itemName="Premium Quiz Access"
+            size="large"
+            className="premium-hero-btn"
+          />
         </div>
       </div>
     </div>
