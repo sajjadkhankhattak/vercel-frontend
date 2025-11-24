@@ -1,57 +1,90 @@
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 
+                 import.meta.env.VITE_BACKEND_URL || 
+                 'http://localhost:5000';
 
 console.log('API Base URL:', BASE_URL); // Debug log to see what URL is being used
 
+// Create axios instance with default config
+const api = axios.create({
+  baseURL: BASE_URL,
+  timeout: 30000, // 30 second timeout
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
 
+// Add request interceptor for authentication
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor for error handling
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+// Auth functions
 export const register = async (userData) => {
-  return await axios.post(`${BASE_URL}/api/auth/signup`, userData);
+  return await api.post('/api/auth/signup', userData);
 }
 
 export const login = async (userData) => {
-  return await axios.post(`${BASE_URL}/api/auth/login`, userData);
+  return await api.post('/api/auth/login', userData);
 }
 
-// Add these new functions for quizzes
+// Quiz functions
 export const createQuiz = async (quizData) => {
-  return await axios.post(`${BASE_URL}/api/quiz`, quizData);
+  return await api.post('/api/quiz', quizData);
 }
 
 export const getQuizzes = async () => {
-  return await axios.get(`${BASE_URL}/api/quiz`);
+  return await api.get('/api/quiz');
 }
 
 export const deleteQuiz = async (id) => {
-  return await axios.delete(`${BASE_URL}/api/quiz/${id}`);
+  return await api.delete(`/api/quiz/${id}`);
 }
 
 export const updateQuiz = async (id, quizData) => {
-  return await axios.put(`${BASE_URL}/api/quiz/${id}`, quizData);
+  return await api.put(`/api/quiz/${id}`, quizData);
 }
 
-// Add this to your existing services/api.js
 export const sendQuizData = async (quizData) => {
-  return await axios.post(`${BASE_URL}/api/quiz/test`, quizData);
+  return await api.post('/api/quiz/test', quizData);
 }
-// Add these to your existing API functions
 
-// Create new user
+// User functions
 export const createUser = async (userData) => {
-  return await axios.post(`${BASE_URL}/api/auth/signup`, userData);
+  return await api.post('/api/auth/signup', userData);
 }
 
-// Update user
 export const updateUser = async (userId, userData) => {
-  return await axios.put(`${BASE_URL}/api/users/${userId}`, userData);
+  return await api.put(`/api/users/${userId}`, userData);
 }
 
-// Delete user
 export const deleteUser = async (userId) => {
-  return await axios.delete(`${BASE_URL}/api/users/${userId}`);
+  return await api.delete(`/api/users/${userId}`);
 }
 
-// Get all users]
 export const getUsers = async () => {
-  return await axios.get(`${BASE_URL}/api/users`);
+  return await api.get('/api/users');
 }
