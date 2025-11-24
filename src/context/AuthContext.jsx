@@ -64,6 +64,7 @@ export const AuthProvider = ({ children }) => {
         setToken(data.token);
         setUser(data.user);
         localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user)); // Store user data for compatibility
         return { success: true, user: data.user };
       } else {
         return { success: false, message: data.message };
@@ -90,6 +91,7 @@ export const AuthProvider = ({ children }) => {
         setToken(data.token);
         setUser(data.user);
         localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user)); // Store user data for compatibility
         return { success: true, user: data.user };
       } else {
         return { success: false, message: data.message };
@@ -104,6 +106,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setToken(null);
     localStorage.removeItem('token');
+    localStorage.removeItem('user'); // Remove both token and user data
   };
 
   const isAuthenticated = () => {

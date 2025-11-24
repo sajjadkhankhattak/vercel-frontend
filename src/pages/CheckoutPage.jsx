@@ -10,7 +10,19 @@ import '../styles/CheckoutPage.css';
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, user, loading: authLoading } = useAuth();
+  
+  // Safe auth hook usage with error boundary
+  let authData;
+  try {
+    authData = useAuth();
+  } catch (error) {
+    console.error('AuthProvider not available, redirecting to login:', error);
+    // Fallback: redirect to login if AuthProvider is not available
+    window.location.href = '/login';
+    return <div>Redirecting to login...</div>;
+  }
+  
+  const { isAuthenticated, user, loading: authLoading } = authData;
   const [paymentStatus, setPaymentStatus] = useState('pending');
   const [clientSecret, setClientSecret] = useState('');
   const [isLoading, setIsLoading] = useState(true);

@@ -12,6 +12,8 @@ const getAuthHeaders = () => {
 class StripeService {
   static async createPaymentIntent(amount, metadata = {}) {
     try {
+      console.log('🔄 Creating payment intent:', { amount, metadata });
+      
       const response = await fetch(`${API_BASE_URL}/api/stripe/create-payment-intent`, {
         method: 'POST',
         headers: getAuthHeaders(),
@@ -21,15 +23,20 @@ class StripeService {
         }),
       });
 
+      console.log('📡 Payment intent response status:', response.status);
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({ error: 'Unknown server error' }));
+        console.error('❌ Payment intent error:', errorData);
+        throw new Error(errorData.error || errorData.details || `HTTP error! status: ${response.status}`);
       }
 
-      return await response.json();
+      const result = await response.json();
+      console.log('✅ Payment intent created:', result.payment_intent_id);
+      return result;
     } catch (error) {
-      console.error('Error creating payment intent:', error);
-      throw error;
+      console.error('💥 Error creating payment intent:', error);
+      throw new Error(error.message || 'Failed to create payment intent');
     }
   }
 

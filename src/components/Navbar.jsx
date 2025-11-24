@@ -1,20 +1,20 @@
 import { Settings, Menu, Plus, User } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { fetchUser } from '../hooks/authService';
+import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const user = fetchUser();
+  const { user, logout, isAuthenticated } = useAuth();
 
   console.log("Navbar - Current User:", user);
+  console.log("Navbar - Is Authenticated:", isAuthenticated());
 
   const isCreateQuizPage = location.pathname === '/create-quiz';
   const isAdminPage = location.pathname === '/admin';
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    logout(); // Use AuthContext logout instead of manual localStorage removal
     navigate("/");
   };
 
@@ -78,7 +78,7 @@ export default function Navbar() {
 
             {/* AUTH LOGIC FIXED */}
             {!isAdminPage && (
-              user ? (
+              isAuthenticated() && user ? (
                 <>
                   {/* Logged-in user: Show Profile + Logout */}
                   <li className="nav-item me-3">
