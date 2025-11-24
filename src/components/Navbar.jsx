@@ -74,19 +74,6 @@ export default function Navbar() {
               </li>
             )}
 
-            {/* Create Quiz (hide on create-quiz & admin) */}
-            {!isCreateQuizPage && !isAdminPage && (
-              <li className="nav-item me-3">
-                <button
-                  onClick={() => navigate('/create-quiz')}
-                  className="btn btn-outline-primary d-flex align-items-center px-3 py-2"
-                >
-                  <Plus size={18} className="me-2" />
-                  Create Quiz
-                </button>
-              </li>
-            )}
-
             {/* AUTH LOGIC FIXED */}
             {!isAdminPage && (
               isAuthenticated() && user ? (
