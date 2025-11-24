@@ -6,6 +6,7 @@ import Contact from '/src/pages/contact'; // Make sure this matches your file na
 import CreateQuiz from '/src/pages/createQuiz'; // Make sure this matches your file name
 import CheckoutPage from '/src/pages/CheckoutPage';
 import AdminLayout from '/src/pages/admin/AdminLayout';
+import AdminProtectedRoute from '/src/components/AdminProtectedRoute';
 import QuizDetails from '/src/pages/quiz-details'; // Make sure this matches your file name
 
 // Import Admin Pages - Fix the paths
@@ -23,7 +24,11 @@ const routes = createBrowserRouter([
     { path: "/checkout", element: <CheckoutPage /> },
     { 
         path: "/admin", 
-        element: <AdminLayout />,
+        element: (
+            <AdminProtectedRoute>
+                <AdminLayout />
+            </AdminProtectedRoute>
+        ),
         children: [
             { index: true, element: <ViewQuizzes /> },
             { path: "view", element: <ViewQuizzes /> },

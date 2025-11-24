@@ -13,6 +13,16 @@ export default function Navbar() {
   const isCreateQuizPage = location.pathname === '/create-quiz';
   const isAdminPage = location.pathname === '/admin';
 
+  // List of admin email addresses (must match backend and AdminProtectedRoute)
+  const ADMIN_EMAILS = [
+    'stylishkhan760@gmail.com',   // Current user  
+    'admin@quizapp.com',          // Add your admin emails here
+    'sajjadkhankhattak@gmail.com' // Add more admin emails as needed
+  ];
+
+  // Check if current user is admin
+  const isUserAdmin = user && ADMIN_EMAILS.includes(user.email);
+
   const handleLogout = () => {
     logout(); // Use AuthContext logout instead of manual localStorage removal
     navigate("/");
@@ -38,12 +48,13 @@ export default function Navbar() {
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav align-items-center ms-auto">
 
-            {/* Admin Portal (hide on /admin) */}
-            {!isAdminPage && (
+            {/* Admin Portal (only show to admins, hide on /admin) */}
+            {!isAdminPage && isUserAdmin && (
               <li className="nav-item me-3">
                 <button
                   onClick={() => navigate('/admin')}
-                  className="btn btn-outline-primary d-flex align-items-center px-3 py-2"
+                  className="btn btn-outline-danger d-flex align-items-center px-3 py-2"
+                  title="Admin Portal - Restricted Access"
                 >
                   <Settings size={18} className="me-2" />
                   Admin Portal

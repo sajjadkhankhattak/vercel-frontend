@@ -51,6 +51,14 @@ export const login = async (userData) => {
   return await api.post('/api/auth/login', userData);
 }
 
+export const getCurrentUser = async () => {
+  return await api.get('/api/auth/profile');
+}
+
+export const checkAdminStatus = async () => {
+  return await api.get('/api/auth/admin-status');
+}
+
 // Quiz functions
 export const createQuiz = async (quizData) => {
   return await api.post('/api/quiz', quizData);
