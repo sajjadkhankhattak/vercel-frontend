@@ -16,16 +16,8 @@ export default function ViewQuizzes() {
         setLoading(true);
         const response = await getQuizzes();
         if (response.data.success) {
-          // Transform data to match table format
-          const transformedQuizzes = response.data.quizzes.map(quiz => ({
-            id: quiz._id,
-            title: quiz.title,
-            category: quiz.category,
-            questions: quiz.questions.length,
-            created: new Date(quiz.createdAt).toLocaleDateString(),
-            status: 'Active' // Assuming all quizzes are active
-          }));
-          setQuizzes(transformedQuizzes);
+          // Keep original quiz data for admin view
+          setQuizzes(response.data.quizzes);
         } else {
           setError('Failed to fetch quizzes');
         }
@@ -106,6 +98,7 @@ export default function ViewQuizzes() {
               <table className="table table-hover">
                 <thead>
                   <tr>
+                    <th>Image</th>
                     <th>Title</th>
                     <th>Category</th>
                     <th>Questions</th>
@@ -116,17 +109,32 @@ export default function ViewQuizzes() {
                 </thead>
                 <tbody>
                   {filteredQuizzes.map(quiz => (
-                    <tr key={quiz.id}>
+                    <tr key={quiz._id}>
+                      <td>
+                        {quiz.image ? (
+                          <img 
+                            src={quiz.image} 
+                            alt={quiz.title}
+                            style={{ width: '40px', height: '40px', objectFit: 'cover' }}
+                            className="rounded"
+                          />
+                        ) : (
+                          <div 
+                            className="bg-light rounded d-flex align-items-center justify-content-center text-muted"
+                            style={{ width: '40px', height: '40px', fontSize: '12px' }}
+                          >
+                            No img
+                          </div>
+                        )}
+                      </td>
                       <td>{quiz.title}</td>
                       <td>
                         <span className="badge bg-secondary">{quiz.category}</span>
                       </td>
-                      <td>{quiz.questions}</td>
-                      <td>{quiz.created}</td>
+                      <td>{quiz.questions.length}</td>
+                      <td>{new Date(quiz.createdAt).toLocaleDateString()}</td>
                       <td>
-                        <span className={`badge ${quiz.status === 'Active' ? 'bg-success' : 'bg-warning'}`}>
-                          {quiz.status}
-                        </span>
+                        <span className="badge bg-success">Active</span>
                       </td>
                       <td>
                         <button className="btn btn-sm btn-outline-primary">

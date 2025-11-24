@@ -60,8 +60,33 @@ export const checkAdminStatus = async () => {
 }
 
 // Quiz functions
-export const createQuiz = async (quizData) => {
-  return await api.post('/api/quiz', quizData);
+export const createQuiz = async (quizData, imageFile = null) => {
+  // If there's an image, use FormData, otherwise use JSON
+  if (imageFile) {
+    const formData = new FormData();
+    
+    // Append quiz data as JSON string
+    formData.append('title', quizData.title);
+    formData.append('description', quizData.description || '');
+    formData.append('category', quizData.category);
+    formData.append('duration', quizData.duration || '');
+    formData.append('difficulty', quizData.difficulty || '');
+    formData.append('tags', JSON.stringify(quizData.tags || []));
+    formData.append('questions', JSON.stringify(quizData.questions));
+    
+    // Append image file
+    formData.append('image', imageFile);
+    
+    return await api.post('/api/quiz', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      timeout: 60000 // 60 seconds for image uploads
+    });
+  } else {
+    // No image, send as JSON
+    return await api.post('/api/quiz', quizData);
+  }
 }
 
 export const getQuizzes = async () => {

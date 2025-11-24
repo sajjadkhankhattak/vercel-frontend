@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { Plus, X, Save } from 'lucide-react';
+import { Plus, X, Save, Upload, Image } from 'lucide-react';
 import { createQuiz } from '../../services/api.js';
 
 export default function AddQuiz() {
@@ -9,6 +9,8 @@ export default function AddQuiz() {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const navigate = useNavigate();
 
   const addQuestion = () => {
@@ -41,6 +43,108 @@ export default function AddQuiz() {
     }));
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        setError('Only JPEG, PNG, GIF, and WebP images are allowed');
+        return;
+      }
+      
+      // Reduce file size limit to 2MB to prevent timeouts
+      if (file.size > 2 * 1024 * 1024) {
+        setError('Image size must be less than 2MB to prevent upload timeouts');
+        return;
+      }
+
+      // Compress image if it's larger than 1MB
+      if (file.size > 1024 * 1024) {
+        compressImage(file).then(compressedFile => {
+          setImageFile(compressedFile);
+          setError(null);
+          
+          // Create preview
+          const reader = new FileReader();
+          reader.onload = (e) => setImagePreview(e.target.result);
+          reader.readAsDataURL(compressedFile);
+        }).catch(err => {
+          console.error('Image compression error:', err);
+          setError('Failed to process image. Please try a smaller image.');
+        });
+      } else {
+        setImageFile(file);
+        setError(null);
+
+        // Create preview
+        const reader = new FileReader();
+        reader.onload = (e) => setImagePreview(e.target.result);
+        reader.readAsDataURL(file);
+      }
+    }
+  };
+
+  // Image compression function
+  const compressImage = (file) => {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculate new dimensions (max 800px width)
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 600;
+        let { width, height } = img;
+        
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height = (height * MAX_WIDTH) / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width = (width * MAX_HEIGHT) / height;
+            height = MAX_HEIGHT;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Draw and compress
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const compressedFile = new File([blob], file.name, {
+                type: file.type,
+                lastModified: Date.now()
+              });
+              resolve(compressedFile);
+            } else {
+              reject(new Error('Image compression failed'));
+            }
+          },
+          file.type,
+          0.8 // 80% quality
+        );
+      };
+      
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  const removeImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    // Clear file input
+    const fileInput = document.getElementById('quiz-image');
+    if (fileInput) fileInput.value = '';
+  };
+
   const onSubmit = async (data) => {
     try {
       setLoading(true);
@@ -49,6 +153,12 @@ export default function AddQuiz() {
       // Validate questions
       if (questions.length === 0) {
         setError('At least one question is required');
+        return;
+      }
+
+      // Validate image size if present
+      if (imageFile && imageFile.size > 2 * 1024 * 1024) {
+        setError('Image is too large. Please select a smaller image (max 2MB).');
         return;
       }
 
@@ -66,18 +176,37 @@ export default function AddQuiz() {
         questions: formattedQuestions
       };
 
-      const response = await createQuiz(quizData);
+      console.log('🚀 Submitting quiz...', { 
+        hasImage: !!imageFile, 
+        imageSize: imageFile ? Math.round(imageFile.size / 1024) + 'KB' : 'No image',
+        questionsCount: formattedQuestions.length
+      });
+
+      // Call API with or without image
+      const response = await createQuiz(quizData, imageFile);
 
       if (response.data.success) {
         alert('Quiz created successfully!');
         reset();
         setQuestions([]);
+        removeImage();
         navigate('/admin/view'); // Redirect to view quizzes page
       } else {
-        setError('Failed to create quiz');
+        setError('Failed to create quiz: ' + (response.data.message || 'Unknown error'));
       }
     } catch (err) {
-      setError('Error creating quiz: ' + err.message);
+      console.error('Quiz creation error:', err);
+      
+      // Handle different types of errors
+      if (err.code === 'ECONNABORTED' || err.message.includes('timeout')) {
+        setError('Upload timeout. Please try with a smaller image (max 1MB) or check your internet connection.');
+      } else if (err.response?.status === 403) {
+        setError('Access denied. You need admin privileges to create quizzes.');
+      } else if (err.response?.status === 413) {
+        setError('Image is too large. Please select a smaller image.');
+      } else {
+        setError('Error creating quiz: ' + (err.response?.data?.message || err.message));
+      }
     } finally {
       setLoading(false);
     }
@@ -131,6 +260,62 @@ export default function AddQuiz() {
             rows="3"
             {...register('description')}
           />
+        </div>
+
+        {/* Image Upload Section */}
+        <div className="mb-4">
+          <label className="form-label">Quiz Image (Optional)</label>
+          <div className="border rounded p-3">
+            {!imagePreview ? (
+              <div className="text-center">
+                <input
+                  type="file"
+                  id="quiz-image"
+                  className="d-none"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                />
+                <label
+                  htmlFor="quiz-image"
+                  className="btn btn-outline-primary d-flex flex-column align-items-center p-3"
+                  style={{ cursor: 'pointer' }}
+                >
+                  <Upload size={32} className="mb-2" />
+                  <span>Click to upload image</span>
+                  <small className="text-muted mt-1">JPEG, PNG, GIF, WebP (Max 2MB)</small>
+                  <small className="text-muted d-block">Images larger than 1MB will be automatically compressed</small>
+                </label>
+              </div>
+            ) : (
+              <div className="row align-items-center">
+                <div className="col-md-3">
+                  <img
+                    src={imagePreview}
+                    alt="Quiz preview"
+                    className="img-fluid rounded"
+                    style={{ maxHeight: '120px', objectFit: 'cover' }}
+                  />
+                </div>
+                <div className="col-md-6">
+                  <h6 className="mb-1">Image uploaded successfully!</h6>
+                  <p className="text-muted small mb-0">
+                    <Image size={16} className="me-1" />
+                    {imageFile?.name} ({Math.round(imageFile?.size / 1024)} KB)
+                  </p>
+                </div>
+                <div className="col-md-3 text-end">
+                  <button
+                    type="button"
+                    className="btn btn-outline-danger btn-sm"
+                    onClick={removeImage}
+                  >
+                    <X size={16} className="me-1" />
+                    Remove
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Questions Section */}
