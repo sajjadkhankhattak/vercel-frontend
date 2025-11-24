@@ -107,7 +107,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   const isAuthenticated = () => {
-    return !!token && !!user;
+    const authenticated = !!token && !!user;
+    console.log('Auth check:', { token: !!token, user: !!user, authenticated });
+    return authenticated;
   };
 
   const getAuthHeaders = () => {

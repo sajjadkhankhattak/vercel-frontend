@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-import { login } from "../services/api";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const {
@@ -12,28 +12,35 @@ export default function Login() {
   } = useForm();
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login: authLogin } = useAuth();
+
+  // Get return path from navigation state
+  const returnTo = location.state?.returnTo || '/';
+  const checkoutData = location.state?.checkoutData;
 
   const onSubmit = async (data) => {
     try {
       console.log("Login data:", data);
       
-      // Use your service function
-      const response = await login({
-        email: data.email,
-        password: data.password
-      });
+      // Use AuthContext login function instead of direct API call
+      const result = await authLogin(data.email, data.password);
 
-      console.log("Login response:", response.data);
-      
-      // Store token or user data
-      if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
+      if (result.success) {
+        console.log("Login successful:", result.user);
+        
+        alert("✅ Login successful!");
+        reset();
+        
+        // Navigate to return path (checkout page if came from premium button)
+        if (returnTo === '/checkout' && checkoutData) {
+          navigate('/checkout', { state: checkoutData });
+        } else {
+          navigate(returnTo);
+        }
+      } else {
+        setError("root", { message: result.message || "Login failed. Please try again." });
       }
-      
-      alert("✅ Login successful!");
-      reset();
-      navigate("/");
       
     } catch (error) {
       console.error("Login error:", error);

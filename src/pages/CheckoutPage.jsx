@@ -10,7 +10,7 @@ import '../styles/CheckoutPage.css';
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, loading: authLoading } = useAuth();
   const [paymentStatus, setPaymentStatus] = useState('pending');
   const [clientSecret, setClientSecret] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -24,8 +24,14 @@ const CheckoutPage = () => {
   };
 
   useEffect(() => {
+    // Wait for auth loading to complete before checking authentication
+    if (authLoading) {
+      return;
+    }
+
     // Check if user is authenticated before allowing payment
     if (!isAuthenticated()) {
+      console.log('User not authenticated, redirecting to login');
       navigate('/login', { 
         state: { 
           returnTo: '/checkout',
@@ -35,6 +41,8 @@ const CheckoutPage = () => {
       });
       return;
     }
+
+    console.log('User authenticated, creating payment intent for:', user);
 
     // Create payment intent when component mounts
     const createPaymentIntent = async () => {
@@ -62,7 +70,7 @@ const CheckoutPage = () => {
     };
 
     createPaymentIntent();
-  }, [checkoutData.amount, checkoutData.itemName, isAuthenticated, user]);
+  }, [checkoutData.amount, checkoutData.itemName, isAuthenticated, user, authLoading, navigate]);
 
   const handlePaymentSuccess = () => {
     setPaymentStatus('success');

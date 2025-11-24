@@ -1,7 +1,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-import { register } from "../services/api";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Signup() {
   const {
@@ -9,13 +9,20 @@ export default function Signup() {
     handleSubmit,
     watch,
     formState: { errors, isSubmitting },
-    reset
+    reset,
+    setError
   } = useForm();
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const { signup: authSignup } = useAuth();
   const password = watch("password");
 
-  // Send data to backend using your service
+  // Get return path from navigation state
+  const returnTo = location.state?.returnTo || '/';
+  const checkoutData = location.state?.checkoutData;
+
+  // Send data to backend using AuthContext
   const onSubmit = async (data) => {
     try {
       console.log("Form data:", data);
@@ -28,17 +35,28 @@ export default function Signup() {
         password: data.password
       };
 
-      // Use your service function
-      const response = await register(userData); 
+      // Use AuthContext signup function
+      const result = await authSignup(userData);
       
-      console.log("Backend response:", response.data);
-      alert("✅ Account created successfully!");
-      reset();
-      navigate("/login");
+      if (result.success) {
+        console.log("Signup successful:", result.user);
+        alert("✅ Account created successfully!");
+        reset();
+        
+        // Navigate to return path (checkout page if came from premium button)
+        if (returnTo === '/checkout' && checkoutData) {
+          navigate('/checkout', { state: checkoutData });
+        } else {
+          navigate(returnTo);
+        }
+      } else {
+        setError("root", { message: result.message || "Signup failed. Please try again." });
+      }
       
     } catch (error) {
       console.error("Signup error:", error);
-      alert(`❌ Error: ${error.response?.data?.message || error.message}`);
+      const errorMessage = error.response?.data?.message || error.message;
+      setError("root", { message: `❌ Error: ${errorMessage}` });
     }
   };
 
@@ -175,6 +193,13 @@ export default function Signup() {
                     </div>
                   )}
                 </div>
+
+                {/* Root Error Message */}
+                {errors.root && (
+                  <div className="alert alert-danger" role="alert">
+                    {errors.root.message}
+                  </div>
+                )}
 
                 {/* Submit Button */}
                 <button 
