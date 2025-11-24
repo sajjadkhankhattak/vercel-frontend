@@ -7,7 +7,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL ||
 console.log('API Base URL:', BASE_URL); // Debug log to see what URL is being used
 
 // Create axios instance with default config
-const api = axios.create({
+export const api = axios.create({
   baseURL: BASE_URL,
   timeout: 30000, // 30 second timeout
   headers: {
@@ -91,6 +91,10 @@ export const createQuiz = async (quizData, imageFile = null) => {
 
 export const getQuizzes = async () => {
   return await api.get('/api/quiz');
+}
+
+export const getQuizById = async (id) => {
+  return await api.get(`/api/quiz/${id}`);
 }
 
 export const deleteQuiz = async (id) => {

@@ -1,5 +1,5 @@
 import QuizCard from './QuizCard';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { getQuizzes } from '../services/api';
 
 // QuizGrid Component
@@ -31,12 +31,22 @@ export default function QuizGrid() {
     fetchQuizzes();
   }, []);
 
-  // Get unique categories from quizzes
-  const categories = ['All', ...new Set(quizzes.map(quiz => quiz.category))];
+  // Memoize categories to prevent recalculation
+  const categories = useMemo(() => {
+    return ['All', ...new Set(quizzes.map(quiz => quiz.category))];
+  }, [quizzes]);
 
-  const filteredQuizzes = selectedCategory === 'All' 
-    ? quizzes 
-    : quizzes.filter(quiz => quiz.category === selectedCategory);
+  // Memoize filtered quizzes to prevent recalculation
+  const filteredQuizzes = useMemo(() => {
+    return selectedCategory === 'All' 
+      ? quizzes 
+      : quizzes.filter(quiz => quiz.category === selectedCategory);
+  }, [quizzes, selectedCategory]);
+
+  // Memoize category button click handler
+  const handleCategoryClick = useCallback((category) => {
+    setSelectedCategory(category);
+  }, []);
 
   if (loading) {
     return (
@@ -74,8 +84,13 @@ export default function QuizGrid() {
             {categories.map((category) => (
               <button
                 key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`btn ${selectedCategory === category ? 'btn-primary' : 'btn-outline-primary'} btn-sm px-3`}
+                onClick={() => handleCategoryClick(category)}
+                className={`btn ${selectedCategory === category ? 'btn-primary' : 'btn-outline-primary'} btn-sm px-3 transition-all`}
+                style={{
+                  transition: 'all 0.2s ease-in-out',
+                  minWidth: '80px',
+                  border: '1px solid #007bff'
+                }}
               >
                 {category}
               </button>

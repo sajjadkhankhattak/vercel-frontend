@@ -26,7 +26,10 @@ export default function UpdateQuiz() {
             title: quiz.title,
             category: quiz.category,
             description: quiz.description,
-            questions: quiz.questions
+            questions: quiz.questions,
+            tags: quiz.tags || [],
+            duration: quiz.duration || 30,
+            difficulty: quiz.difficulty || 'medium'
           }));
           setQuizzes(transformedQuizzes);
         } else {
@@ -66,7 +69,11 @@ export default function UpdateQuiz() {
       const updateData = {
         title: data.title,
         category: data.category,
-        description: data.description
+        description: data.description,
+        questions: selectedQuiz.questions, // Include existing questions
+        tags: selectedQuiz.tags || [],
+        duration: selectedQuiz.duration || 30,
+        difficulty: selectedQuiz.difficulty || 'medium'
       };
 
       const response = await updateQuiz(selectedQuiz.id, updateData);

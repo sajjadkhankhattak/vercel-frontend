@@ -12,3 +12,41 @@
 .transition-all {
   transition: all 0.2s ease-in-out;
 }
+
+/* Quiz Tab Buttons - Prevent Glitching */
+.btn {
+  transition: all 0.2s ease-in-out !important;
+  transform: translateZ(0); /* Force hardware acceleration */
+  will-change: background-color, border-color, color, box-shadow;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.btn:focus,
+.btn:active,
+.btn:hover {
+  transform: translateZ(0);
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Prevent button layout shift */
+.btn-outline-primary {
+  border: 1px solid #007bff !important;
+  background-color: transparent !important;
+}
+
+.btn-primary {
+  border: 1px solid #007bff !important;
+  background-color: #007bff !important;
+}
+
+/* Smooth quiz card transitions */
+.card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  will-change: transform, box-shadow;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}

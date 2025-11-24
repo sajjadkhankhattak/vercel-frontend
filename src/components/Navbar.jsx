@@ -1,4 +1,4 @@
-import { Settings, Menu, Plus, User } from 'lucide-react';
+import { Settings, Menu, Plus, User, BarChart3 } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -91,6 +91,17 @@ export default function Navbar() {
             {!isAdminPage && (
               isAuthenticated() && user ? (
                 <>
+                  {/* Dashboard Link */}
+                  <li className="nav-item me-3">
+                    <button
+                      onClick={() => navigate('/dashboard')}
+                      className="btn btn-outline-info d-flex align-items-center px-3 py-2"
+                    >
+                      <BarChart3 size={18} className="me-2" />
+                      Dashboard
+                    </button>
+                  </li>
+
                   {/* Logged-in user: Show Profile + Logout */}
                   <li className="nav-item me-3">
                     <span className="btn btn-outline-secondary px-3 py-2">

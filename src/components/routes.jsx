@@ -5,8 +5,12 @@ import Signup from "/src/pages/Signup";
 import Contact from '/src/pages/contact'; // Make sure this matches your file name
 import CreateQuiz from '/src/pages/createQuiz'; // Make sure this matches your file name
 import CheckoutPage from '/src/pages/CheckoutPage';
+import TakeQuiz from '/src/pages/TakeQuiz';
+import QuizResult from '/src/pages/QuizResult';
+import UserDashboard from '/src/pages/UserDashboard';
 import AdminLayout from '/src/pages/admin/AdminLayout';
 import AdminProtectedRoute from '/src/components/AdminProtectedRoute';
+import ProtectedRoute from '/src/components/ProtectedRoute';
 import QuizDetails from '/src/pages/quiz-details'; // Make sure this matches your file name
 
 // Import Admin Pages - Fix the paths
@@ -22,6 +26,30 @@ const routes = createBrowserRouter([
     { path: "/login", element: <Login /> },
     { path: "/signup", element: <Signup /> },
     { path: "/checkout", element: <CheckoutPage /> },
+    { 
+        path: "/dashboard", 
+        element: (
+            <ProtectedRoute>
+                <UserDashboard />
+            </ProtectedRoute>
+        ) 
+    },
+    { 
+        path: "/take-quiz/:quizId", 
+        element: (
+            <ProtectedRoute>
+                <TakeQuiz />
+            </ProtectedRoute>
+        ) 
+    },
+    { 
+        path: "/quiz-result/:attemptId", 
+        element: (
+            <ProtectedRoute>
+                <QuizResult />
+            </ProtectedRoute>
+        ) 
+    },
     { 
         path: "/admin", 
         element: (

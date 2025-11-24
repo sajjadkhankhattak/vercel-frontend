@@ -2,13 +2,27 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="400" height="180" viewBox="0 0 400 180">
   <defs>
     <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#4f46e5;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
     </linearGradient>
   </defs>
   <rect width="400" height="180" fill="url(#grad)"/>
-  <text x="200" y="75" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white" text-anchor="middle">Quiz</text>
-  <text x="200" y="105" font-family="Arial, sans-serif" font-size="16" fill="white" text-anchor="middle" opacity="0.8">Default Image</text>
-  <circle cx="200" cy="140" r="20" fill="white" opacity="0.2"/>
-  <path d="M190 140 L200 150 L210 140 Z" fill="white" opacity="0.6"/>
+  
+  <!-- Quiz Icon -->
+  <circle cx="200" cy="60" r="25" fill="white" opacity="0.2"/>
+  <text x="200" y="70" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="white" text-anchor="middle">?</text>
+  
+  <!-- Main Text -->
+  <text x="200" y="110" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="white" text-anchor="middle">Quiz Challenge</text>
+  <text x="200" y="130" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle" opacity="0.9">Test Your Knowledge</text>
+  
+  <!-- Decorative Elements -->
+  <circle cx="50" cy="40" r="8" fill="white" opacity="0.3"/>
+  <circle cx="350" cy="140" r="12" fill="white" opacity="0.2"/>
+  <circle cx="80" cy="150" r="6" fill="white" opacity="0.4"/>
+  <circle cx="320" cy="30" r="10" fill="white" opacity="0.25"/>
+  
+  <!-- Play Button -->
+  <circle cx="200" cy="155" r="15" fill="white" opacity="0.9"/>
+  <path d="M195 150 L195 160 L205 155 Z" fill="#667eea"/>
 </svg>

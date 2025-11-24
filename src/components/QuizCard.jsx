@@ -1,29 +1,41 @@
 import { Play, Clock, Users, Image as ImageIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { memo, useCallback, useMemo } from 'react';
 
 // QuizCard Component
-export default function QuizCard({ quiz }) {
+const QuizCard = memo(({ quiz }) => {
   const navigate = useNavigate();
 
-  const handleCardClick = () => {
-    navigate(`/quiz/${quiz._id}`);
-  };
+  const handleCardClick = useCallback(() => {
+    navigate(`/take-quiz/${quiz._id}`);
+  }, [quiz._id, navigate]);
 
-  // Use quiz image from database or fallback to default
-  const getQuizImage = () => {
+  // Memoize quiz image to prevent recalculation
+  const quizImage = useMemo(() => {
     if (quiz.image) {
       return quiz.image; // This will be base64 string from database
     }
     // Fallback to default based on category
     const defaultImages = {
-      'Programming': '/images/programming.jpg',
-      'Web Development': '/images/webdev.jpg',
-      'Science': '/images/science.jpg',
-      'Mathematics': '/images/math.jpg',
-      'General Knowledge': '/images/general.jpg'
+      'Programming': '/images/default-quiz.svg',
+      'Web Development': '/images/default-quiz.svg',
+      'Science': '/images/default-quiz.svg',
+      'Mathematics': '/images/default-quiz.svg',
+      'General Knowledge': '/images/default-quiz.svg',
+      'Technology': '/images/default-quiz.svg',
+      'History': '/images/default-quiz.svg',
+      'Geography': '/images/default-quiz.svg'
     };
-    return defaultImages[quiz.category] || '/images/default-quiz.jpg';
-  };
+    return defaultImages[quiz.category] || '/images/default-quiz.svg';
+  }, [quiz.image, quiz.category]);
+
+  // Memoize image error handler
+  const handleImageError = useCallback((e) => {
+    // Fallback if image fails to load
+    console.log('Image failed to load, using default');
+    e.target.src = '/images/default-quiz.svg';
+    e.target.onerror = null; // Prevent infinite loop
+  }, []);
 
   return (
     <div className="col-md-4 mb-4">
@@ -33,14 +45,12 @@ export default function QuizCard({ quiz }) {
         style={{ cursor: 'pointer' }}>
         <div className="position-relative">
           <img
-            src={getQuizImage()}
+            src={quizImage}
             className="card-img-top"
             alt={quiz.title}
             style={{ height: '180px', objectFit: 'cover' }}
-            onError={(e) => {
-              // Fallback if image fails to load
-              e.target.src = '/images/default-quiz.jpg';
-            }}
+            onError={handleImageError}
+            loading="lazy"
           />
           <div className="position-absolute top-0 end-0 m-3">
             <span className="badge bg-dark bg-opacity-75 text-white px-2 py-1">
@@ -83,4 +93,8 @@ export default function QuizCard({ quiz }) {
       </div>
     </div>
   );
-}
+});
+
+QuizCard.displayName = 'QuizCard';
+
+export default QuizCard;
